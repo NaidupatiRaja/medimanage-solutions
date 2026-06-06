@@ -7,82 +7,13 @@ const navMenu = document.getElementById('navMenu');
 
 mobileToggle.addEventListener('click', () => {
     navMenu.classList.toggle('active');
-    mobileToggle.classList.toggle('active');
 });
 
 // Close menu when a nav link is clicked
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
         navMenu.classList.remove('active');
-        mobileToggle.classList.remove('active');
     });
-});
-
-// ========================================
-// MODAL FUNCTIONALITY
-// ========================================
-
-const contactModal = document.getElementById('contactModal');
-const modalClose = document.getElementById('modalClose');
-const contactForm = document.getElementById('contactForm');
-
-// All CTA buttons that open the modal
-const ctaButtons = [
-    document.getElementById('navCTA'),
-    document.getElementById('heroCTA'),
-    document.getElementById('ctaButton')
-];
-
-// Open modal when any CTA button is clicked
-ctaButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-        e.preventDefault();
-        contactModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
-});
-
-// Close modal when close button is clicked
-modalClose.addEventListener('click', () => {
-    contactModal.classList.remove('active');
-    document.body.style.overflow = 'auto';
-});
-
-// Close modal when clicking outside the modal content
-contactModal.addEventListener('click', (e) => {
-    if (e.target === contactModal) {
-        contactModal.classList.remove('active');
-        document.body.style.overflow = 'auto';
-    }
-});
-
-// Handle form submission
-contactForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Get form data
-    const formData = new FormData(contactForm);
-    const data = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        hospital: formData.get('hospital'),
-        role: formData.get('role'),
-        phone: formData.get('phone'),
-        message: formData.get('message')
-    };
-    
-    // Log the form data (in a real application, this would be sent to a server)
-    console.log('Form submitted:', data);
-    
-    // Show success message
-    alert(`Thank you, ${data.name}! Your consultation request has been received. We'll contact you soon at ${data.email}.`);
-    
-    // Reset form
-    contactForm.reset();
-    
-    // Close modal
-    contactModal.classList.remove('active');
-    document.body.style.overflow = 'auto';
 });
 
 // ========================================
@@ -90,18 +21,15 @@ contactForm.addEventListener('submit', (e) => {
 // ========================================
 
 const navbar = document.querySelector('.navbar');
-let lastScrollTop = 0;
 
 window.addEventListener('scroll', () => {
     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     
     if (scrollTop > 50) {
-        navbar.style.boxShadow = '0 2px 8px rgba(0, 102, 204, 0.12)';
+        navbar.style.boxShadow = '0 2px 8px rgba(31, 53, 104, 0.12)';
     } else {
         navbar.style.boxShadow = 'none';
     }
-    
-    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
 });
 
 // ========================================
@@ -150,8 +78,8 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
-// Observe all service cards, step cards, and other animatable elements
-document.querySelectorAll('.service-card, .step-card, .benefit-icon').forEach(element => {
+// Observe all service cards and reason cards
+document.querySelectorAll('.service-card, .reason-card, .process-step, .impact-card').forEach(element => {
     element.style.opacity = '0';
     element.style.transform = 'translateY(20px)';
     element.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
@@ -176,7 +104,6 @@ function animateCounter(element, target, duration = 2000) {
     }, 16);
 }
 
-// Animate stats when they come into view
 const statsObserverOptions = {
     threshold: 0.5
 };
@@ -184,10 +111,8 @@ const statsObserverOptions = {
 const statsObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            const statNum = entry.target.querySelector('.stat-num');
+            const statNum = entry.target.querySelector('.stat-number');
             const numText = statNum.textContent;
-            
-            // Extract number from text (handles formats like "2,450", "94%", "18+")
             const number = parseInt(numText.replace(/[^\d]/g, ''));
             
             if (!isNaN(number)) {
@@ -199,123 +124,47 @@ const statsObserver = new IntersectionObserver((entries) => {
     });
 }, statsObserverOptions);
 
-// Observe all stats
-document.querySelectorAll('.stat').forEach(stat => {
+document.querySelectorAll('.stat-box').forEach(stat => {
     statsObserver.observe(stat);
 });
 
 // ========================================
-// LEARN MORE BUTTON SCROLL
+// FORM SUBMISSION
 // ========================================
 
-const learnMoreBtn = document.getElementById('learnMoreBtn');
-if (learnMoreBtn) {
-    learnMoreBtn.addEventListener('click', () => {
-        const howItWorks = document.getElementById('how-it-works');
-        const elementPosition = howItWorks.getBoundingClientRect().top + window.scrollY;
-        const navHeight = navbar.offsetHeight;
+const contactForm = document.getElementById('contactForm');
+
+if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
         
-        window.scrollTo({
-            top: elementPosition - navHeight - 20,
-            behavior: 'smooth'
-        });
+        const formData = new FormData(contactForm);
+        const data = {
+            name: formData.get('name'),
+            hospital: formData.get('hospital'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            message: formData.get('message')
+        };
+        
+        // Log form data (in production, send to backend)
+        console.log('Form submitted:', data);
+        
+        // Show success message
+        alert(`Thank you ${data.name}! Your inquiry has been received. We'll contact you soon at ${data.phone}.`);
+        
+        // Reset form
+        contactForm.reset();
     });
 }
-
-// ========================================
-// KEYBOARD NAVIGATION
-// ========================================
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && contactModal.classList.contains('active')) {
-        contactModal.classList.remove('active');
-        document.body.style.overflow = 'auto';
-    }
-});
-
-// ========================================
-// FORM VALIDATION
-// ========================================
-
-const emailInput = document.getElementById('email');
-const phoneInput = document.getElementById('phone');
-
-emailInput.addEventListener('blur', () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emailInput.value && !emailRegex.test(emailInput.value)) {
-        emailInput.style.borderColor = '#ff6b6b';
-    } else {
-        emailInput.style.borderColor = '';
-    }
-});
-
-phoneInput.addEventListener('blur', () => {
-    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-    if (phoneInput.value && !phoneRegex.test(phoneInput.value)) {
-        phoneInput.style.borderColor = '#ff6b6b';
-    } else {
-        phoneInput.style.borderColor = '';
-    }
-});
-
-// ========================================
-// HERO DASHBOARD ANIMATION
-// ========================================
-
-const chartBars = document.querySelectorAll('.chart-bar');
-chartBars.forEach((bar, index) => {
-    bar.style.animation = `fillChart 0.8s ease-out ${index * 0.1}s forwards`;
-});
-
-// Add animation keyframes dynamically
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fillChart {
-        from {
-            height: 0;
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// ========================================
-// FEATURE DETECTION & POLYFILLS
-// ========================================
-
-// Smooth scroll polyfill check
-if (!('scrollBehavior' in document.documentElement.style)) {
-    console.warn('Smooth scroll not supported, using fallback');
-}
-
-// ========================================
-// PERFORMANCE OPTIMIZATION
-// ========================================
-
-// Throttle scroll events for better performance
-let ticking = false;
-
-window.addEventListener('scroll', () => {
-    if (!ticking) {
-        window.requestAnimationFrame(() => {
-            // Scroll event handling
-            ticking = false;
-        });
-        ticking = true;
-    }
-}, { passive: true });
 
 // ========================================
 // ACCESSIBILITY ENHANCEMENTS
 // ========================================
 
-// Add focus styles for keyboard navigation
 document.querySelectorAll('button, a').forEach(element => {
     element.addEventListener('focus', () => {
-        element.style.outline = '2px solid #0066cc';
+        element.style.outline = '2px solid #1F3568';
         element.style.outlineOffset = '2px';
     });
     
@@ -325,21 +174,18 @@ document.querySelectorAll('button, a').forEach(element => {
 });
 
 // ========================================
-// ANALYTICS & TRACKING (Optional)
+// PERFORMANCE OPTIMIZATION
 // ========================================
 
-// Track button clicks
-ctaButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        console.log('CTA button clicked');
-        // Send analytics event
-    });
-});
+let ticking = false;
 
-// Track form submissions
-contactForm.addEventListener('submit', () => {
-    console.log('Contact form submitted');
-    // Send analytics event
-});
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        window.requestAnimationFrame(() => {
+            ticking = false;
+        });
+        ticking = true;
+    }
+}, { passive: true });
 
-console.log('MediManage Solutions website loaded successfully!');
+console.log('MediManage Solutions website initialized successfully!');
